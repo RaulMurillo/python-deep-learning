@@ -1,5 +1,6 @@
 # coding: utf-8
 import numpy as np
+from skimage.util.shape import view_as_windows
 
 
 def smooth_curve(x):
@@ -41,31 +42,39 @@ def im2col(input_data, filter_h, filter_w, stride=1, pad=0):
 
     Parameters
     ----------
-    input_data : 由(数据量, 通道, 高, 长)的4维数组构成的输入数据
-    filter_h : 滤波器的高
-    filter_w : 滤波器的长
-    stride : 步幅
-    pad : 填充
+    input_data : Input data composed of a four-dimensional array of (number, channel, height, width)
+    filter_h : Filter height
+    filter_w : Filter length
+    stride : Stride
+    pad : Padding
 
     Returns
     -------
-    col : 2维数组
+    col : 2-dimensional array
     """
     N, C, H, W = input_data.shape
     out_h = (H + 2*pad - filter_h)//stride + 1
     out_w = (W + 2*pad - filter_w)//stride + 1
 
+    ## Naive approach ##
+    # img = np.pad(input_data, [(0,0), (0,0), (pad, pad), (pad, pad)], 'constant')
+    # col = np.zeros((N, C, filter_h, filter_w, out_h, out_w))
+
+    # for y in range(filter_h):
+    #     y_max = y + stride*out_h
+    #     for x in range(filter_w):
+    #         x_max = x + stride*out_w
+    #         col[:, :, y, x, :, :] = img[:, :, y:y_max:stride, x:x_max:stride]
+
+    # col = col.transpose(0, 4, 5, 1, 2, 3).reshape(N*out_h*out_w, -1)
+    # return col
+
+    ## Memory Strides ##
     img = np.pad(input_data, [(0,0), (0,0), (pad, pad), (pad, pad)], 'constant')
-    col = np.zeros((N, C, filter_h, filter_w, out_h, out_w))
-
-    for y in range(filter_h):
-        y_max = y + stride*out_h
-        for x in range(filter_w):
-            x_max = x + stride*out_w
-            col[:, :, y, x, :, :] = img[:, :, y:y_max:stride, x:x_max:stride]
-
-    col = col.transpose(0, 4, 5, 1, 2, 3).reshape(N*out_h*out_w, -1)
-    return col
+    strides = (1,1) + (stride,)*2
+    
+    return view_as_windows(img, (1, C, filter_h, filter_w), 
+                            strides).reshape(N*out_h*out_w, -1)
 
 
 def col2im(col, input_shape, filter_h, filter_w, stride=1, pad=0):
@@ -74,15 +83,15 @@ def col2im(col, input_shape, filter_h, filter_w, stride=1, pad=0):
     Parameters
     ----------
     col :
-    input_shape : 输入数据的形状（例：(10, 1, 28, 28)）
+    input_shape : The shape of the input data (for example: (10, 1, 28, 28))
     filter_h :
-    filter_w
-    stride
-    pad
+    filter_w :
+    stride : Stride
+    pad : Padding
 
     Returns
     -------
-
+    img : 
     """
     N, C, H, W = input_shape
     out_h = (H + 2*pad - filter_h)//stride + 1
