@@ -16,7 +16,7 @@ class SimpleConvNet:
     Parameters
     ----------
     input_size : Input size (784 in the case of MNIST)
-    hidden_size_list : List of the number of neurons in the hidden layer (e.g. [100, 100, 100])
+    hidden_size_list : List of the number of neurons in the hidden layers (e.g. [100, 100, 100])
     output_size : Output size (10 in the case of MNIST)
     activation : 'relu' or 'sigmoid'
     weight_init_std : Specify the standard deviation of the weight (e.g. 0.01)
@@ -63,7 +63,15 @@ class SimpleConvNet:
 
     def loss(self, x, t):
         """Find the loss function
-        Parameter x is input data, t is label data
+
+        Parameters
+        ----------
+        x : input data
+        t : label data
+
+        Returns
+        -------
+        The value of the loss function
         """
         y = self.predict(x)
         return self.last_layer.forward(y, t)
