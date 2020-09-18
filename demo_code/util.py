@@ -4,9 +4,9 @@ from skimage.util.shape import view_as_windows
 
 
 def smooth_curve(x):
-    """用于使损失函数的图形变圆滑
+    """Used to round out the graph of the loss function
 
-    参考：http://glowingpython.blogspot.jp/2012/02/convolution-with-numpy.html
+    reference: http://glowingpython.blogspot.jp/2012/02/convolution-with-numpy.html
     """
     window_len = 11
     s = np.r_[x[window_len-1:0:-1], x, x[-1:-window_len:-1]]
@@ -16,16 +16,16 @@ def smooth_curve(x):
 
 
 def shuffle_dataset(x, t):
-    """打乱数据集
+    """Shuffle the data set
 
     Parameters
     ----------
-    x : 训练数据
-    t : 监督数据
+    x: training data
+    t: supervision data
 
     Returns
     -------
-    x, t : 打乱的训练数据和监督数据
+    x, t : Disrupted training data and supervision data
     """
     permutation = np.random.permutation(x.shape[0])
     x = x[permutation,:] if x.ndim == 2 else x[permutation,:,:,:]
@@ -38,7 +38,9 @@ def conv_output_size(input_size, filter_size, stride=1, pad=0):
 
 
 def im2col(input_data, filter_h, filter_w, stride=1, pad=0):
-    """
+    """Expands the `input_data` to fit the convolution kernel (filter) as a two-dimensional matrix.
+
+    reference: https://towardsdatascience.com/how-are-convolutions-actually-performed-under-the-hood-226523ce7fbf
 
     Parameters
     ----------

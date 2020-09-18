@@ -1,6 +1,6 @@
 # coding: utf-8
 import sys, os
-sys.path.append(os.pardir)  # 为了导入父目录的文件而进行的设定
+sys.path.append(os.pardir)  # Settings for importing files in the parent directory
 import pickle
 import numpy as np
 from collections import OrderedDict
@@ -9,19 +9,19 @@ from demo_code.gradient import numerical_gradient
 
 
 class SimpleConvNet:
-    """简单的ConvNet
+    """Simple ConvNet
 
     conv - relu - pool - affine - relu - affine - softmax
     
     Parameters
     ----------
-    input_size : 输入大小（MNIST的情况下为784）
-    hidden_size_list : 隐藏层的神经元数量的列表（e.g. [100, 100, 100]）
-    output_size : 输出大小（MNIST的情况下为10）
+    input_size : Input size (784 in the case of MNIST)
+    hidden_size_list : List of the number of neurons in the hidden layer (e.g. [100, 100, 100])
+    output_size : Output size (10 in the case of MNIST)
     activation : 'relu' or 'sigmoid'
-    weight_init_std : 指定权重的标准差（e.g. 0.01）
-        指定'relu'或'he'的情况下设定“He的初始值”
-        指定'sigmoid'或'xavier'的情况下设定“Xavier的初始值”
+    weight_init_std : Specify the standard deviation of the weight (e.g. 0.01)
+        Set "Initial value of He" when specifying 'relu' or'he'
+        Set "Xavier initial value" when specifying'sigmoid' or 'xavier'
     """
     def __init__(self, input_dim=(1, 28, 28), 
                  conv_param={'filter_num':30, 'filter_size':5, 'pad':0, 'stride':1},
@@ -34,7 +34,7 @@ class SimpleConvNet:
         conv_output_size = (input_size - filter_size + 2*filter_pad) / filter_stride + 1
         pool_output_size = int(filter_num * (conv_output_size/2) * (conv_output_size/2))
 
-        # 初始化权重
+        # Weight initializarion
         self.params = {}
         self.params['W1'] = weight_init_std * np.random.randn(filter_num, input_dim[0], filter_size, filter_size)
         self.params['b1'] = np.zeros(filter_num)
@@ -43,7 +43,7 @@ class SimpleConvNet:
         self.params['W3'] = weight_init_std * np.random.randn(hidden_size, output_size)
         self.params['b3'] = np.zeros(output_size)
 
-        # 生成层
+        # Layers generation
         self.layers = OrderedDict()
         self.layers['Conv1'] = Convolution(self.params['W1'], self.params['b1'],
                                            conv_param['stride'], conv_param['pad'])
@@ -62,8 +62,8 @@ class SimpleConvNet:
         return x
 
     def loss(self, x, t):
-        """求损失函数
-        参数x是输入数据、t是标签数据
+        """Find the loss function
+        Parameter x is input data, t is label data
         """
         y = self.predict(x)
         return self.last_layer.forward(y, t)
@@ -83,18 +83,18 @@ class SimpleConvNet:
         return acc / x.shape[0]
 
     def numerical_gradient(self, x, t):
-        """求梯度（数值微分）
+        """Find the gradient (numerical differentiation)
 
         Parameters
         ----------
-        x : 输入数据
-        t : 标签数据
+        x: input data
+        t: label data
 
         Returns
         -------
-        具有各层的梯度的字典变量
-            grads['W1']、grads['W2']、...是各层的权重
-            grads['b1']、grads['b2']、...是各层的偏置
+        Dictionary variable with gradient of each layer
+            grads['W1'], grads['W2'], ...Is the weight of each layer
+            grads['b1'], grads['b2'], ...Is the bias of each layer
         """
         loss_w = lambda w: self.loss(x, t)
 
@@ -106,18 +106,18 @@ class SimpleConvNet:
         return grads
 
     def gradient(self, x, t):
-        """求梯度（误差反向传播法）
+        """Find the gradient (error back propagation method)
 
         Parameters
         ----------
-        x : 输入数据
-        t : 标签数据
+        x: input data
+        t: label data
 
         Returns
         -------
-        具有各层的梯度的字典变量
-            grads['W1']、grads['W2']、...是各层的权重
-            grads['b1']、grads['b2']、...是各层的偏置
+        Dictionary variable with gradient of each layer
+            grads['W1'], grads['W2'], ...Is the weight of each layer
+            grads['b1'], grads['b2'], ...Is the bias of each layer
         """
         # forward
         self.loss(x, t)
@@ -131,7 +131,7 @@ class SimpleConvNet:
         for layer in layers:
             dout = layer.backward(dout)
 
-        # 设定
+        # set up
         grads = {}
         grads['W1'], grads['b1'] = self.layers['Conv1'].dW, self.layers['Conv1'].db
         grads['W2'], grads['b2'] = self.layers['Affine1'].dW, self.layers['Affine1'].db

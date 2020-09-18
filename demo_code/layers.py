@@ -44,12 +44,12 @@ class Affine:
         
         self.x = None
         self.original_x_shape = None
-        # 权重和偏置参数的导数
+        # Derivative of weight and bias parameters
         self.dW = None
         self.db = None
 
     def forward(self, x):
-        # 对应张量
+        # Corresponding tensor
         self.original_x_shape = x.shape
         x = x.reshape(x.shape[0], -1)
         self.x = x
@@ -63,15 +63,15 @@ class Affine:
         self.dW = np.dot(self.x.T, dout)
         self.db = np.sum(dout, axis=0)
         
-        dx = dx.reshape(*self.original_x_shape)  # 还原输入数据的形状（对应张量）
+        dx = dx.reshape(*self.original_x_shape)  # Restore the shape of the input data (corresponding tensor)
         return dx
 
 
 class SoftmaxWithLoss:
     def __init__(self):
         self.loss = None
-        self.y = None # softmax的输出
-        self.t = None # 监督数据
+        self.y = None # softmax output
+        self.t = None # Supervision data
 
     def forward(self, x, t):
         self.t = t
@@ -82,7 +82,7 @@ class SoftmaxWithLoss:
 
     def backward(self, dout=1):
         batch_size = self.t.shape[0]
-        if self.t.size == self.y.size: # 监督数据是one-hot-vector的情况
+        if self.t.size == self.y.size: # The case where the supervised data is a one-hot-vector
             dx = (self.y - self.t) / batch_size
         else:
             dx = self.y.copy()
@@ -119,13 +119,13 @@ class BatchNormalization:
         self.gamma = gamma
         self.beta = beta
         self.momentum = momentum
-        self.input_shape = None # Conv层的情况下为4维，全连接层的情况下为2维  
+        self.input_shape = None # In the case of the Conv layer, it is 4-dimensional, and in the case of the fully connected layer, it is 2-dimensional  
 
-        # 测试时使用的平均值和方差
+        # Mean and variance used in the test
         self.running_mean = running_mean
         self.running_var = running_var  
         
-        # backward时使用的中间数据
+        # Intermediate data used when backward
         self.batch_size = None
         self.xc = None
         self.std = None
@@ -202,12 +202,12 @@ class Convolution:
         self.stride = stride
         self.pad = pad
         
-        # 中间数据（backward时使用）
+        # Intermediate data (used when backward)
         self.x = None   
         self.col = None
         self.col_W = None
         
-        # 权重和偏置参数的梯度
+        # Gradient of weight and bias parameters
         self.dW = None
         self.db = None
 

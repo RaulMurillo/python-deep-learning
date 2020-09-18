@@ -3,7 +3,7 @@ import numpy as np
 from demo_code.optimizer import *
 
 class Trainer:
-    """进行神经网络的训练的类
+    """Class for training neural networks
     """
     def __init__(self, network, x_train, t_train, x_test, t_test,
                  epochs=20, mini_batch_size=100,
